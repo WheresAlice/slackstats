@@ -5,6 +5,8 @@ This is a Shiny app for predicting the next two years of your Slack organisation
 
 Since the app does some very heavy work on predicting on graph-render, it is pretty slow to load.
 
+![Screenshot](screenshot.png)
+
 ## Usage
 
 1. Download a CSV file from <https://my.slack.com/stats>
