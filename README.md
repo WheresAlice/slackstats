@@ -11,5 +11,5 @@ Since the app does some very heavy work on predicting on graph-render, it is pre
 
 1. Download a CSV file from <https://my.slack.com/stats>
 2. Put this in the current directory as `slack.csv`
-3. ???
+3. `docker-compose up`
 4. Profit

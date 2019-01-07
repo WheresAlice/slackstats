@@ -1,0 +1,23 @@
+version: "3.0"
+
+services:
+  shiny:
+    container_name: shiny
+    # Prophet can take a considerable amount of time to build so we use a prebuilt image
+    # The included Dockerfile can be used instead if you really want to build this yourself
+    image: kaerast/shinyprophet
+    #build:
+    #  context: .
+    #  dockerfile: Dockerfile
+    restart: always
+    user: 'root'
+    # Uncomment the lines below to disable application logs STDOUT output
+    # environment:
+    #   - APPLICATION_LOGS_TO_STDOUT=false
+    ports:
+      - '80:3838'
+    volumes:
+      - 'shiny_logs:/var/log/shiny-server'
+      - './:/srv/shiny-server'
+volumes:
+  shiny_logs:
