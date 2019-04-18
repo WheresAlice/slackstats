@@ -11,25 +11,28 @@ ui <- fluidPage(
    sidebarLayout(
       sidebarPanel(
          selectInput("variable", "Variable:",
-                     c("Total Users" = "Total.Users",
+                     c("Total Users" = "Total.membership",
                        "Full Members" = "Full.Members",
                        "Guests" = "Guests",
-                       "Daily Active Users" = "Daily.Active.Users",
-                       "Daily Users Posting Messages" = "Daily.Users.Posting.Messages",
-                       "Weekly Active Users" = "Weekly.Active.Users",
-                       "Weekly Users Posting Messages" = "Weekly.Users.Posting.Messages",
-                       "Messages in Public Channels" = "Messages.in.Public.Channels",
-                       "Messages in Private Channels" = "Messages.in.Private.Channels",
-                       "Messages in Shared Channels" = "Messages.in.Shared.Channels",
+                       "Daily Active Users" = "Daily.active.members",
+                       "Daily Users Posting Messages" = "Daily.members.posting.messages",
+                       "Weekly Active Users" = "Weekly.active.members",
+                       "Weekly Users Posting Messages" = "Weekly.mambers.posting.messages",
+                       "Messages in Public Channels" = "Messages.in.public.channels",
+                       "Messages in Private Channels" = "Messages.in.private.channels",
+                       "Messages in Shared Channels" = "Messages.in.shared.Channels",
                        "Messages in DMs" = "Messages.in.DMs",
-                       "Percentage of Messages Posted in Public Channels" = "X..of.Messages.Posted.in.Public.Channels",
-                       "Percentage of Messages Posted in Private Channels" = "X..of.Messages.Posted.in.Private.Channels",
-                       "Percentage of Messages Posted in DMs" = "X..of.Messages.Posted.in.DMs",
-                       "Percentage of Messages Read in Public Channels" = "X..of.Messages.Read.in.Public.Channels",
-                       "Percentage of Messages Read in Private Channels" = "X..of.Messages.Read.in.Private.Channels",
-                       "Percentage of Messages Read in DMs" = "X..of.Messages.Read.in.DMs",
-                       "Public Workspace Channels" = "Public.Workspace.Channels",
-                       "Messages Posted" = "Messages.Posted")
+                       "Percentage of Messages Posted in Public Channels" = "Percent.of.messages..public.channels",
+                       "Percentage of Messages Posted in Private Channels" = "Percent.of.messages..private.channels",
+                       "Percentage of Messages Posted in DMs" = "Percent.of.messages..DMs",
+                       "Percentage of Message Views in Public Channels" = "Percent.of.views..public.channels",
+                       "Percentage of Message Views in Private Channels" = "Percent.of.views..private.channels",
+                       "Percentage of Message Views in DMs" = "Percent.of.views..DMs",
+                       "Files uploaded" = "Files.uploaded",
+                       "Messages posted by members" = "Messages.posted.by.members",
+                       "Public Workspace Channels" = "Public.channels..single.workspace",
+                       "Messages Posted" = "Messages.Posted",
+                       "Messages posted by apps" = "Messages.posted.by.apps")
                      )
       ),
       
@@ -47,16 +50,19 @@ server <- function(input, output) {
      slack <- read.csv("slack.csv")
      
      # Do some cleaning up
-     clean_slack <- slack[slack$Total.Users != 0,]
+     clean_slack <- slack[slack$Total.membership != 0,]
      dates <- as.POSIXct(strptime(clean_slack$Date, "%Y-%m-%d"))
      
-     # Pick which variable to predict (Total.Users is most useful)
+     # Pick which variable to predict (Total.membership is most useful)
      prophet_df <- data.frame(dates, c(clean_slack[input$variable]))
      
      # Make a dataframe that prophet is happy with
      names(prophet_df) =c("ds","y")
-     m <- prophet(prophet_df)
-     
+     m <- prophet(daily.seasonality = TRUE)
+     m <- add_country_holidays(m, country_name = "UK")
+     m <- fit.prophet(m, prophet_df)
+     #m <- prophet(prophet_df)
+
      # Predict the next two years
      future = make_future_dataframe(m, periods = 365 * 2)
      forecast = predict(m, future)
